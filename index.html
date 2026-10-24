@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Architectural Interior AI Prompt Studio</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['Space Grotesk', 'monospace'],
+          },
+          colors: {
+            architect: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              200: '#e2e8f0',
+              300: '#cbd5e1',
+              400: '#94a3b8',
+              500: '#64748b',
+              600: '#475569',
+              700: '#334155',
+              800: '#1e293b',
+              900: '#0f172a',
+            },
+            draft: {
+              blue: '#2563eb',
+              cyan: '#0284c7'
+            }
+          },
+          boxShadow: {
+            'blueprint': '0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.03)',
+            'subtle-elevation': '0 4px 16px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03)',
+            'sharp-card': '0 10px 30px -4px rgba(15, 23, 42, 0.06), 0 4px 8px -2px rgba(15, 23, 42, 0.02)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Architectural subtle dot grid pattern */
+    .blueprint-bg {
+      background-color: #f8fafc;
+      background-image: radial-gradient(#cbd5e1 0.75px, transparent 0.75px);
+      background-size: 20px 20px;
+    }
+    /* Elegant dropdown arrows */
+    .arch-select {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 0.75rem center;
+      background-repeat: no-repeat;
+      background-size: 1.15em 1.15em;
+      padding-right: 2.25rem;
+      appearance: none;
+    }
+    /* Custom light scrollbars */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="blueprint-bg text-architect-800 font-sans min-h-screen antialiased selection:bg-architect-200 selection:text-architect-900 pb-16">
+
+  <!-- Header -->
+  <header class="bg-white/95 backdrop-blur border-b border-architect-200/80 sticky top-0 z-30 shadow-blueprint">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3.5">
+        <div class="w-9 h-9 rounded-lg bg-architect-900 text-white flex items-center justify-center shadow-sm">
+          <i data-lucide="compass" class="w-5 h-5 text-architect-200"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-sm sm:text-base font-semibold tracking-tight text-architect-900 font-mono uppercase">Atelier // Interior AI Studio</h1>
+            <span class="text-[10px] font-mono tracking-widest bg-architect-100 text-architect-600 px-2 py-0.5 rounded border border-architect-200/70">SPEC v2.4</span>
+          </div>
+          <p class="text-xs text-architect-500 hidden sm:block">Concept Design & Spatial Lighting Engine</p>
+        </div>
+      </div>
+      
+      <!-- Top Action Bar -->
+      <div class="flex items-center gap-2">
+        <button id="btnInspire" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-architect-700 bg-architect-100 hover:bg-architect-200/80 rounded-lg transition-colors border border-architect-200" title="Inspire Architecture Randomizer">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-draft-blue"></i>
+          <span class="hidden sm:inline">Inspire Architecture</span>
+          <span class="sm:hidden">Inspire</span>
+        </button>
+        <button id="btnReset" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-architect-500 hover:text-architect-800 hover:bg-architect-100 rounded-lg transition-colors" title="Reset to default">
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+          <span class="hidden sm:inline">Reset</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-7">
+      
+      <!-- LEFT COLUMN: Interior Form & Vault (7 cols) -->
+      <section class="lg:col-span-7 space-y-6">
+        
+        <!-- Architectural Parameters Card -->
+        <div class="bg-white/95 border border-architect-200/90 rounded-2xl p-6 shadow-subtle-elevation">
+          
+          <div class="flex items-center justify-between border-b border-architect-100 pb-4 mb-5">
+            <div>
+              <span class="text-[11px] font-mono uppercase tracking-wider text-draft-blue font-medium">Design Formulation</span>
+              <h2 class="text-sm font-semibold tracking-tight text-architect-900 uppercase">Spatial & Optical Parameters</h2>
+            </div>
+            <div class="flex items-center gap-1.5 text-xs text-architect-500 font-mono bg-architect-50 border border-architect-200/70 px-2.5 py-1 rounded-md">
+              <i data-lucide="layers" class="w-3.5 h-3.5 text-architect-400"></i>
+              <span>ISO 100 // 24mm Tilt-Shift</span>
+            </div>
+          </div>
+
+          <form id="interiorForm" class="space-y-4" onsubmit="event.preventDefault();">
+            
+            <!-- 1. Prompt Title / Name Field -->
+            <div>
+              <label for="promptTitle" class="block text-xs font-semibold text-architect-700 mb-1 flex items-center justify-between">
+                <span class="flex items-center gap-1.5">
+                  <i data-lucide="pencil" class="w-3 h-3 text-architect-400"></i> Prompt Title / Project Name
+                </span>
+                <span class="text-[10px] text-architect-400 font-normal">Identifies preset in database</span>
+              </label>
+              <input 
+                type="text" 
+                id="promptTitle" 
+                value="Minimalist Concrete Loft & Daylight Void"
+                placeholder="e.g., Scandinavian Oak Penthouse Kitchen" 
+                class="w-full text-sm bg-architect-50/50 border border-architect-200 rounded-xl px-3.5 py-2.5 text-architect-900 placeholder:text-architect-400 focus:outline-none focus:ring-2 focus:ring-architect-400/40 focus:border-architect-500 transition-all shadow-blueprint"
+              />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- 2. Interior Space / Structure -->
+              <div>
+                <label for="spaceType" class="block text-xs font-semibold text-architect-700 mb-1 flex items-center gap-1.5">
+                  <i data-lucide="home" class="w-3.5 h-3.5 text-architect-500"></i> Interior Space / Structure
+                </label>
+                <select id="spaceType" class="arch-select w-full text-xs sm:text-sm bg-white border border-architect-200 rounded-xl px-3 py-2.5 text-architect-800 focus:outline-none focus:ring-2 focus:ring-architect-400/40 focus:border-architect-500 shadow-blueprint transition-all cursor-pointer">
+                  <option value="cottage_house">Cottage house</option>
+                  <option value="modern_apartment" selected>Modern apartment</option>
+                  <option value="large_kitchen">Large modern home kitchen</option>
+                  <option value="farmhouse_kitchen">Farm house kitchen</option>
+                  <option value="indoor_pool">Indoor pool area</option>
+                  <option value="vintage_mansion">Vintage mansion</option>
+                  <option value="suburban_lounge">Suburban middle class home lounge</option>
+                  <option value="airport">Major city airport</option>
+                  <option value="train_station">Old train station</option>
+                  <option value="warehouse">Warehouse / factory</option>
+                  <option value="library">Large city library</option>
+                  <option value="rural_school">Small rural school</option>
+                  <option value="hotel_lobby">5 star hotel lobby</option>
+                  <option value="night_club">Night club</option>
+                  <option value="saloon_bar">Saloon bar</option>
+                  <option value="concert_theatre">Concert theatre</option>
+                  <option value="coffee_shop">Coffee shop</option>
+                  <option value="restaurant">Restaurant</option>
+                  <option value="fashion_retail">Fashion retail</option>
+                  <option value="fast_food">Fast food outlet</option>
+                  <option value="shopping_complex">Multi level shopping complex</option>
+                </select>
+              </div>
+
+              <!-- 3. Lighting Dropdown -->
+              <div>
+                <label for="lightingStyle" class="block text-xs font-semibold text-architect-700 mb-1 flex items-center gap-1.5">
+                  <i data-lucide="sun-medium" class="w-3.5 h-3.5 text-architect-500"></i> Lighting Environment
+                </label>
+                <select id="lightingStyle" class="arch-select w-full text-xs sm:text-sm bg-white border border-architect-200 rounded-xl px-3 py-2.5 text-architect-800 focus:outline-none focus:ring-2 focus:ring-architect-400/40 focus:border-architect-500 shadow-blueprint transition-all cursor-pointer">
+                  <option value="daylight" selected>Natural daylight (streaming diffuse sun, morning illumination)</option>
+                  <option value="night_artificial">Night time artificial light (ambient evening balance, interior lamps)</option>
+                  <option value="fluorescent">Fluorescent tube electric (industrial strips, clinical crisp)</option>
+                  <option value="warm_downlights">Warm white modern bulb / downlights (recessed 3000K spots)</option>
+                  <option value="multi_source">Multi light source (mixed temperatures, task, cove & bounce)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- 4. Materiality & Architectural Style -->
+              <div>
+                <label for="materialityStyle" class="block text-xs font-semibold text-architect-700 mb-1 flex items-center gap-1.5">
+                  <i data-lucide="box" class="w-3.5 h-3.5 text-architect-500"></i> Materiality & Style
+                </label>
+                <select id="materialityStyle" class="arch-select w-full text-xs sm:text-sm bg-white border border-architect-200 rounded-xl px-3 py-2.5 text-architect-800 focus:outline-none focus:ring-2 focus:ring-architect-400/40 focus:border-architect-500 shadow-blueprint transition-all cursor-pointer">
+                  <option value="scandi_minimal" selected>Scandinavian Minimalist (Oak, linen, off-white lime wash)</option>
+                  <option value="brutalist_concrete">Brutalist Concrete (Board-formed concrete, bronze accents, slate)</option>
+                  <option value="mid_century">Mid-Century Modern (American walnut, brushed brass, travertine)</option>
+                  <option value="neoclassical">Neo-Classical (Carrara marble, intricate plaster moldings, fluted stone)</option>
+                  <option value="industrial_loft">Industrial Raw (Exposed red brick, black steel I-beams, polished screed)</option>
+                  <option value="wabi_sabi">Japanese Wabi-Sabi (Charred yakisugi cedar, clay plaster, tatami tones)</option>
+                </select>
+              </div>
+
+              <!-- 5. Camera Shot & Framing -->
+              <div>
+                <label for="cameraFraming" class="block text-xs font-semibold text-architect-700 mb-1 flex items-center gap-1.5">
+                  <i data-lucide="camera" class="w-3.5 h-3.5 text-architect-500"></i> Camera Perspective & Optics
+                </label>
+                <select id="cameraFraming" class="arch-select w-full text-xs sm:text-sm bg-white border border-architect-200 rounded-xl px-3 py-2.5 text-architect-800 focus:outline-none focus:ring-2 focus:ring-architect-400/40 focus:border-architect-500 shadow-blueprint transition-all cursor-pointer">
+                  <option value="eye_level_two_point" selected>Eye-Level Two-Point Perspective (Architectural symmetry)</option>
+                  <option value="wide_tilt_shift">Wide-Angle 24mm Tilt-Shift (Zero vertical perspective convergence)</option>
+                  <option value="sectional_axial">Sectional Axial One-Point Framing (Hero frontal view)</option>
+                  <option value="vignette_detail">Vignette Focal Detail (Intimate depth of field f/2.8 focus)</option>
+                  <option value="vault_ceiling">Ceiling Vault & Structural Soffit View (Looking upward)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- 6. Additional Prompt Factor (Max 240 chars) -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label for="additionalFactors" class="block text-xs font-semibold text-architect-700 flex items-center gap-1.5">
+                  <i data-lucide="feather" class="w-3.5 h-3.5 text-architect-500"></i> Additional Spatial Detail / Accent Factor
+                </label>
+                <span id="charCountBadge" class="text-[11px] font-mono text-architect-400">0 / 240</span>
+              </div>
+              <textarea 
+                id="additionalFactors" 
+                maxlength="240"
+                rows="2"
+                placeholder="e.g., Double-height ceiling void, floor-to-ceiling pivot windows, terrazzo flooring, potted fiddle leaf fig..."
+                class="w-full text-xs sm:text-sm bg-architect-50/40 border border-architect-200 rounded-xl p-3 text-architect-800 placeholder:text-architect-400 focus:outline-none focus:ring-2 focus:ring-architect-400/40 focus:border-architect-500 shadow-blueprint transition-all resize-none"
+              >Polished concrete floors with diffuse skylight reflections, cantilevered oak staircase, understated architectural furniture.</textarea>
+            </div>
+
+            <!-- Slot Save Action Bar -->
+            <div class="pt-3 border-t border-architect-100 flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-2">
+                <label for="slotSelect" class="text-xs font-medium text-architect-600">Target Slot:</label>
+                <select id="slotSelect" class="text-xs bg-white border border-architect-200 rounded-lg px-2.5 py-1.5 text-architect-700 focus:outline-none focus:ring-1 focus:ring-architect-400 font-mono">
+                  <!-- Dynamically populated 1 to 20 -->
+                </select>
+                <button type="button" id="btnSaveToSlot" class="inline-flex items-center gap-1.5 text-xs font-semibold bg-architect-900 hover:bg-architect-800 text-white px-3.5 py-1.5 rounded-lg shadow-sm transition-all active:scale-95">
+                  <i data-lucide="bookmark-check" class="w-3.5 h-3.5"></i>
+                  <span>Save to Slot</span>
+                </button>
+              </div>
+              <span id="saveStatusFeedback" class="text-xs text-emerald-600 font-medium opacity-0 transition-opacity flex items-center gap-1">
+                <i data-lucide="check" class="w-3.5 h-3.5"></i> Preserved in slot
+              </span>
+            </div>
+
+          </form>
+        </div>
+
+        <!-- Preset Vault (20 Discrete Slots) -->
+        <div class="bg-white/95 border border-architect-200/90 rounded-2xl p-6 shadow-subtle-elevation">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-architect-100">
+            <div>
+              <h3 class="text-xs font-mono uppercase tracking-wider text-architect-900 font-bold flex items-center gap-2">
+                <i data-lucide="hard-drive" class="w-4 h-4 text-architect-500"></i>
+                Preset Vault (Slots 01 - 20)
+              </h3>
+              <p class="text-[11px] text-architect-400">Persistent browser local store with JSON snapshot compatibility</p>
+            </div>
+            
+            <!-- Snapshot Import & Export -->
+            <div class="flex items-center gap-2">
+              <input type="file" id="importFileInput" accept=".json" class="hidden">
+              <button id="btnImportJson" class="inline-flex items-center gap-1 text-xs font-medium text-architect-700 bg-architect-100 hover:bg-architect-200/80 px-2.5 py-1.5 rounded-lg transition-colors border border-architect-200">
+                <i data-lucide="upload" class="w-3 h-3 text-architect-500"></i> Import JSON
+              </button>
+              <button id="btnExportJson" class="inline-flex items-center gap-1 text-xs font-medium text-architect-700 bg-architect-100 hover:bg-architect-200/80 px-2.5 py-1.5 rounded-lg transition-colors border border-architect-200">
+                <i data-lucide="download" class="w-3 h-3 text-architect-500"></i> Export JSON
+              </button>
+            </div>
+          </div>
+
+          <!-- Slots Grid -->
+          <div id="slotsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-72 overflow-y-auto pr-1">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+      </section>
+
+      <!-- RIGHT COLUMN: Real-Time Synthesizer & Render Specs (5 cols) -->
+      <section class="lg:col-span-5 space-y-6">
+        
+        <!-- Live Prompt Output Card -->
+        <div class="bg-white/95 border border-architect-200/90 rounded-2xl p-6 shadow-subtle-elevation sticky top-24">
+          <div class="flex items-center justify-between pb-3 border-b border-architect-100">
+            <div class="flex items-center gap-2">
+              <span class="inline-block w-2 h-2 rounded-full bg-draft-blue animate-pulse"></span>
+              <h2 class="text-xs font-mono uppercase tracking-wider text-architect-900 font-bold">Synthesized Architectural Prompt</h2>
+            </div>
+            <span id="promptStats" class="text-[11px] text-architect-400 font-mono">0 chars // 0 words</span>
+          </div>
+
+          <!-- Prompt Output Container -->
+          <div class="mt-4 relative group">
+            <div 
+              id="promptOutput" 
+              class="w-full bg-architect-50/70 border border-architect-200 rounded-xl p-4 text-architect-800 text-xs sm:text-sm leading-relaxed min-h-[220px] max-h-[360px] overflow-y-auto font-sans shadow-inner focus:outline-none selection:bg-architect-200"
+              tabindex="0"
+            >
+              <!-- Filled dynamically by JavaScript -->
+            </div>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="mt-4 grid grid-cols-2 gap-3">
+            <button 
+              id="btnCopyPrompt" 
+              class="relative inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-architect-900 hover:bg-architect-800 text-white text-xs font-semibold rounded-xl shadow-blueprint active:scale-[0.98] transition-all"
+            >
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span id="copyButtonLabel">Copy Prompt</span>
+              <span id="copyTooltip" class="absolute -top-8 px-2 py-1 bg-architect-900 text-white text-[10px] rounded shadow-md opacity-0 pointer-events-none transition-all">Copied to clipboard</span>
+            </button>
+
+            <button 
+              id="btnDownloadPrompt" 
+              class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-architect-100 hover:bg-architect-200 text-architect-800 text-xs font-medium rounded-xl border border-architect-200 shadow-blueprint active:scale-[0.98] transition-all"
+            >
+              <i data-lucide="download" class="w-3.5 h-3.5 text-architect-600"></i>
+              <span>Download (.txt)</span>
+            </button>
+          </div>
+
+          <!-- Architectural Concept Breakdown Badges -->
+          <div class="mt-6 pt-4 border-t border-architect-100 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-mono uppercase tracking-wider text-architect-500 font-semibold">Active Composition Tags</span>
+              <span class="text-[10px] text-architect-400 font-mono">Global Illumination</span>
+            </div>
+            
+            <div class="flex flex-wrap gap-1.5" id="tagsContainer">
+              <!-- Dynamically populated badges -->
+            </div>
+
+            <!-- Architectural Engine Fidelity Callout -->
+            <div class="bg-architect-50 border border-architect-200/80 rounded-xl p-3 text-[11px] text-architect-600 leading-normal flex items-start gap-2.5 mt-3">
+              <i data-lucide="camera-off" class="w-4 h-4 text-draft-blue shrink-0 mt-0.5"></i>
+              <div>
+                <span class="font-semibold text-architect-800">Architectural Photography Standard:</span>
+                Calibrated for Midjourney v6+, Stable Diffusion SDXL, and Flux. Uses real optical mechanics (tilt-shift keystone correction, diffuse radiosity bounce, and tactile material finishes).
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Notification Toast -->
+  <div id="toastNotification" class="fixed bottom-6 right-6 z-50 bg-architect-900 text-white text-xs px-4 py-2.5 rounded-xl shadow-sharp-card flex items-center gap-2.5 opacity-0 pointer-events-none transition-all duration-300 transform translate-y-2">
+    <i data-lucide="info" class="w-4 h-4 text-draft-blue"></i>
+    <span id="toastMessage">Notification message</span>
+  </div>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    const STORAGE_KEY = 'architectural_interior_prompt_presets_v1';
+    const MAX_SLOTS = 20;
+
+    // Architectural Interior Spatial Dictionary
+    const spaceDictionary = {
+      cottage_house: "a charming rustic cottage house interior, timber beamed ceiling, exposed stone chimney breast, reclaimed wide plank floorboards, deeply recessed multi-pane casement windows",
+      modern_apartment: "a sophisticated open-concept modern apartment interior, double-height ceiling void, floor-to-ceiling glass curtain wall, smooth architectural microcement surfaces",
+      large_kitchen: "an expansive high-end modern home kitchen, monumental monolithic quartzite waterfall island, seamless flush handleless veneer joinery, integrated state-of-the-art appliances, subtle linear LED shadow gaps",
+      farmhouse_kitchen: "a character-rich farm house kitchen, deep ceramic apron butler sink, freestanding shaker cabinetry, rustic clay terracotta tile floor, butcher block oak prep surfaces, heritage cast iron cooking hearth",
+      indoor_pool: "a serene luxury indoor pool area, acoustic slatted cedar soffit, fluted limestone columns, glassy turquoise water with gentle caustic reflections, minimalist flush drainage reveals",
+      vintage_mansion: "an opulent vintage historic mansion grand salon, intricate ornamental plaster cornice and ceiling medallions, polished herringbone parquetry, tall French balcony doors, classic wainscoting",
+      suburban_lounge: "a warm contemporary suburban middle-class home lounge, comfortable linen seating, built-in media and book display wall, plush woven wool rug, large garden-facing sliding glass doors",
+      airport: "a state-of-the-art major international airport passenger terminal concourse, sweeping curvilinear aerodynamic roof trusses, polished terrazzo reflecting distant departures, monumental structural steel pylons",
+      train_station: "a heritage grand historic train station waiting hall, monumental arched glass barrel vault atrium, weathered iron structural ribs, clerestory fenestration, clocktower mezzanine",
+      warehouse: "a cavernous industrial warehouse and factory conversion, exposed structural steel I-beams, authentic weathered masonry, high factory saw-tooth skylights, raw polished screed concrete floor",
+      library: "a monumental public city library interior, multi-tiered walnut bookshelves accessible via brass gallery ladders, monumental skylit central reading atrium, acoustic felt ceiling baffles",
+      rural_school: "a thoughtfully designed small rural school classroom, durable warm birch plywood joinery, clerestory natural ventilation louvers, tactile linoleum flooring, child-height indoor-outdoor portal",
+      hotel_lobby: "a dramatic 5-star luxury hotel grand lobby, monumental backlit onyx concierge counter, custom brass sculpture installation, fluted travertine walls, monumental double-height entry lounge",
+      night_club: "a moody subterranean VIP night club interior, dark reflective smoked glass mirrors, concealed perimeter neon cove grazing, sculpted velvet booth niches, low atmospheric haze",
+      saloon_bar: "an authentic historic saloon bar interior, long dark stained mahogany bar counter with brass footrail, mirrored backbar shelving stocked with vintage decanters, pressed tin ceiling tiles",
+      concert_theatre: "a world-class symphonic concert theatre auditorium, acoustically sculpted acoustic timber fins and curvature walls, tiered crimson velvet balcony seating, grand architectural proscenium arch",
+      coffee_shop: "an artisanal specialty coffee shop interior, minimalist stainless steel espresso station, raw plaster walls, warm Tasmanian oak communal bench, polished micro-terrazzo floors",
+      restaurant: "an intimate fine dining restaurant interior, low-lit banquette seating in bouclé fabric, tactile dark walnut tables, acoustic timber slat partitions creating secluded private zones",
+      fashion_retail: "an ultra-minimalist luxury fashion retail boutique, sculptural cast-concrete display plinths, recessed track lighting grazing off-white lime wash walls, floating stainless steel garment rails",
+      fast_food: "a bright modern fast-food outlet interior, vibrant modular fiberglass banquette seating, clean white subway tile walls, slick digital menu boards, durable poured resin flooring",
+      shopping_complex: "a multi-level metropolitan shopping complex atrium, flowing organic mezzanine balconies with glass balustrades, central soaring glass dome skylight, scenic glass elevators"
+    };
+
+    // Lighting Mechanics Dictionary
+    const lightingDictionary = {
+      daylight: "illuminated by streaming natural daylight, soft morning sunbeams slicing through fenestration, delicate diffuse bounce, natural window glow without harsh hot spots",
+      night_artificial: "capturing balanced night-time artificial illumination, atmospheric low-lux warm lamps (2700K), exterior twilight blue hour visible through glass, nuanced interior shadows",
+      fluorescent: "lit by crisp industrial fluorescent tube electric strips, clean linear light runs, clinical cool white illumination, subtle authentic green-tint undertones on polished floors",
+      warm_downlights: "illuminated by precision warm-white recessed modern LED downlights (3000K), intentional focal pools of light on surfaces, dark ceiling planes, theatrical task lighting",
+      multi_source: "dynamic multi light source environment, layered combination of concealed perimeter LED cove lighting, warm accent table lamps, and soft indirect wall wash bounce"
+    };
+
+    // Materiality & Architectural Style Dictionary
+    const materialityDictionary = {
+      scandi_minimal: "Scandinavian minimalism aesthetic, white-oiled solid oak elements, natural off-white lime wash walls, beige linen upholstery, clean shadow gaps",
+      brutalist_concrete: "Brutalist architectural aesthetic, honest board-formed raw concrete surfaces, patinated cast bronze details, dark charcoal basalt stone, monumental geometry",
+      mid_century: "Mid-Century Modern architectural palette, rich American walnut wall cladding, brushed brass hardware, honed travertine floor tiles, classic modernist silhouette",
+      neoclassical: "Neo-Classical interior elegance, honed white Carrara marble slabs, intricate sculpted plaster ceiling moldings, fluted pilasters, gilt leaf detailing",
+      industrial_loft: "Industrial warehouse loft materiality, exposed weathered red brick masonry, black matte steel structural members, exposed zinc spiral ductwork, heavy timber ties",
+      wabi_sabi: "Japanese Wabi-Sabi organic interior, charred yakisugi timber screens, hand-troweled textured clay plaster, woven tatami textures, subtle earthen tonal harmony"
+    };
+
+    // Perspective & Framing Dictionary
+    const cameraDictionary = {
+      eye_level_two_point: "eye-level two-point architectural perspective, perfectly balanced corner vantage point, true horizontal alignment, calibrated classical interior framing",
+      wide_tilt_shift: "shot with a 24mm architectural tilt-shift lens, wide environmental interior scope, zero vertical convergence with strict parallel lines, edge-to-edge optical clarity",
+      sectional_axial: "frontal sectional axial one-point perspective, rigorous central symmetry, emphasizing structural rhythm, depth, and spatial hierarchy",
+      vignette_detail: "architectural vignette focal detail framing, medium depth of field at f/2.8, beautiful soft background bokeh focusing on material junctions and craft",
+      vault_ceiling: "dramatic low-angle view looking upward toward the structural ceiling vault and soffit details, capturing overhead geometry and lighting integration"
+    };
+
+    // DOM Elements
+    const promptTitleEl = document.getElementById('promptTitle');
+    const spaceTypeEl = document.getElementById('spaceType');
+    const lightingStyleEl = document.getElementById('lightingStyle');
+    const materialityStyleEl = document.getElementById('materialityStyle');
+    const cameraFramingEl = document.getElementById('cameraFraming');
+    const additionalFactorsEl = document.getElementById('additionalFactors');
+    const charCountBadgeEl = document.getElementById('charCountBadge');
+    const promptOutputEl = document.getElementById('promptOutput');
+    const promptStatsEl = document.getElementById('promptStats');
+    const tagsContainerEl = document.getElementById('tagsContainer');
+    const slotSelectEl = document.getElementById('slotSelect');
+    const slotsContainerEl = document.getElementById('slotsContainer');
+    const btnSaveToSlot = document.getElementById('btnSaveToSlot');
+    const saveStatusFeedback = document.getElementById('saveStatusFeedback');
+    const btnCopyPrompt = document.getElementById('btnCopyPrompt');
+    const copyButtonLabel = document.getElementById('copyButtonLabel');
+    const copyTooltip = document.getElementById('copyTooltip');
+    const btnDownloadPrompt = document.getElementById('btnDownloadPrompt');
+    const btnInspire = document.getElementById('btnInspire');
+    const btnReset = document.getElementById('btnReset');
+    const btnExportJson = document.getElementById('btnExportJson');
+    const btnImportJson = document.getElementById('btnImportJson');
+    const importFileInput = document.getElementById('importFileInput');
+    const toastNotification = document.getElementById('toastNotification');
+    const toastMessage = document.getElementById('toastMessage');
+
+    // Synthesis Function
+    function generatePrompt() {
+      const spaceKey = spaceTypeEl.value;
+      const lightKey = lightingStyleEl.value;
+      const materialKey = materialityStyleEl.value;
+      const cameraKey = cameraFramingEl.value;
+      const extra = additionalFactorsEl.value.trim();
+
+      const spaceDesc = spaceDictionary[spaceKey] || spaceDictionary.modern_apartment;
+      const lightDesc = lightingDictionary[lightKey] || lightingDictionary.daylight;
+      const materialDesc = materialityDictionary[materialKey] || materialityDictionary.scandi_minimal;
+      const cameraDesc = cameraDictionary[cameraKey] || cameraDictionary.eye_level_two_point;
+
+      let parts = [];
+
+      parts.push(`Award-winning architectural concept interior photograph capturing ${spaceDesc}.`);
+      parts.push(`Lighting Atmosphere: ${lightDesc}.`);
+      parts.push(`Materiality & Aesthetic: ${materialDesc}.`);
+      parts.push(`Camera Optics & Perspective: ${cameraDesc}.`);
+
+      if (extra.length > 0) {
+        const cleaned = extra.replace(/\.+$/, '');
+        parts.push(`Spatial Details: ${cleaned}.`);
+      }
+
+      parts.push(`Specifications: Architectural Digest publication standard, Hasselblad H6D-100c medium format camera, ray-traced global illumination, octane render realism, crisp textural materiality, 8k resolution, authentic exposure balance.`);
+
+      const fullPrompt = parts.join(' ');
+      promptOutputEl.textContent = fullPrompt;
+
+      // Stats
+      const chars = fullPrompt.length;
+      const words = fullPrompt.split(/\s+/).filter(Boolean).length;
+      promptStatsEl.textContent = `${chars} chars // ${words} words`;
+
+      updateTags();
+    }
+
+    // Dynamic Tag Badges
+    function updateTags() {
+      const spaceTxt = spaceTypeEl.options[spaceTypeEl.selectedIndex].text.split('/')[0].split('(')[0].trim();
+      const lightTxt = lightingStyleEl.options[lightingStyleEl.selectedIndex].text.split('(')[0].trim();
+      const matTxt = materialityStyleEl.options[materialityStyleEl.selectedIndex].text.split('(')[0].trim();
+      const camTxt = cameraFramingEl.options[cameraFramingEl.selectedIndex].text.split('(')[0].trim();
+
+      const tags = [spaceTxt, lightTxt, matTxt, camTxt];
+
+      tagsContainerEl.innerHTML = tags.map(tag => `
+        <span class="inline-flex items-center text-[10px] font-mono font-medium bg-architect-100 text-architect-700 px-2.5 py-1 rounded-md border border-architect-200">
+          ${tag}
+        </span>
+      `).join('');
+    }
+
+    // Character Counter
+    additionalFactorsEl.addEventListener('input', () => {
+      const len = additionalFactorsEl.value.length;
+      charCountBadgeEl.textContent = `${len} / 240`;
+      generatePrompt();
+    });
+
+    // Form Event Listeners
+    [promptTitleEl, spaceTypeEl, lightingStyleEl, materialityStyleEl, cameraFramingEl].forEach(element => {
+      element.addEventListener('change', generatePrompt);
+      element.addEventListener('input', generatePrompt);
+    });
+
+    // Toast Messenger
+    let toastTimeout;
+    function showToast(msg) {
+      toastMessage.textContent = msg;
+      toastNotification.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toastNotification.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
+      }, 2600);
+    }
+
+    // Copy Prompt Function
+    btnCopyPrompt.addEventListener('click', () => {
+      const text = promptOutputEl.textContent;
+      if (!text) return;
+
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'absolute';
+      textarea.style.left = '-9999px';
+      document.body.appendChild(textarea);
+      textarea.select();
+
+      try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+          copyButtonLabel.textContent = "Copied!";
+          copyTooltip.classList.remove('opacity-0');
+          setTimeout(() => {
+            copyButtonLabel.textContent = "Copy Prompt";
+            copyTooltip.classList.add('opacity-0');
+          }, 1800);
+          showToast('Prompt copied to clipboard');
+        } else {
+          showToast('Could not auto-copy');
+        }
+      } catch (e) {
+        showToast('Error during copy');
+      } finally {
+        document.body.removeChild(textarea);
+      }
+    });
+
+    // Download Prompt as .txt
+    btnDownloadPrompt.addEventListener('click', () => {
+      const title = (promptTitleEl.value.trim() || 'architectural_interior_prompt')
+        .toLowerCase()
+        .replace(/[^a-z0-9]/gi, '_')
+        .replace(/_+/g, '_');
+      
+      const payload = 
+`================================================================
+ARCHITECTURAL CONCEPT INTERIOR AI PROMPT SPECIFICATION
+================================================================
+Title:      ${promptTitleEl.value.trim() || 'Untitled Concept'}
+Timestamp:  ${new Date().toLocaleString()}
+Space:      ${spaceTypeEl.options[spaceTypeEl.selectedIndex].text}
+Lighting:   ${lightingStyleEl.options[lightingStyleEl.selectedIndex].text}
+Material:   ${materialityStyleEl.options[materialityStyleEl.selectedIndex].text}
+Camera:     ${cameraFramingEl.options[cameraFramingEl.selectedIndex].text}
+Accents:    ${additionalFactorsEl.value.trim() || 'None specified'}
+
+----------------------------------------------------------------
+SYNTHESIZED AI PROMPT:
+----------------------------------------------------------------
+${promptOutputEl.textContent}
+
+================================================================
+Generated via Atelier Interior AI Studio
+================================================================`;
+
+      const blob = new Blob([payload], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${title}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Downloaded prompt text document');
+    });
+
+    // Inspire Architecture Randomizer
+    btnInspire.addEventListener('click', () => {
+      const getRand = (arr) => arr[Math.floor(Math.random() * arr.length)];
+      const getRandKey = (obj) => getRand(Object.keys(obj));
+
+      spaceTypeEl.value = getRandKey(spaceDictionary);
+      lightingStyleEl.value = getRandKey(lightingDictionary);
+      materialityStyleEl.value = getRandKey(materialityDictionary);
+      cameraFramingEl.value = getRandKey(cameraDictionary);
+
+      const creativeTitles = [
+        "Travertine & Cedar Hotel Lobby Atrium",
+        "Raw Concrete Vault Industrial Loft",
+        "Nordic Timber Sunlit Farmhouse Kitchen",
+        "Subterranean Velvet & Smoke Night Club",
+        "Luminescent Airport Terminal Concourse",
+        "Wabi-Sabi Plaster Reading Nook Library"
+      ];
+      promptTitleEl.value = getRand(creativeTitles);
+
+      const creativeAccents = [
+        "Floor-to-ceiling pivot glass panels, recessed brass curtain pelmet, architectural ficus tree.",
+        "Monolithic cast-terrazzo water fountain basin, linear perimeter shadow gaps, brushed gunmetal joinery.",
+        "Curved fluted timber balustrades, floating cantilevered walnut treads, soft cove radiosity.",
+        "Deep double-height skylight lightwell, bespoke minimalist marble plinth, polished microcement."
+      ];
+      additionalFactorsEl.value = getRand(creativeAccents);
+      charCountBadgeEl.textContent = `${additionalFactorsEl.value.length} / 240`;
+
+      generatePrompt();
+      showToast('Generated architectural concept configuration');
+    });
+
+    // Reset Form
+    btnReset.addEventListener('click', () => {
+      promptTitleEl.value = "Minimalist Concrete Loft & Daylight Void";
+      spaceTypeEl.value = "modern_apartment";
+      lightingStyleEl.value = "daylight";
+      materialityStyleEl.value = "scandi_minimal";
+      cameraFramingEl.value = "eye_level_two_point";
+      additionalFactorsEl.value = "Polished concrete floors with diffuse skylight reflections, cantilevered oak staircase, understated architectural furniture.";
+      charCountBadgeEl.textContent = `${additionalFactorsEl.value.length} / 240`;
+      generatePrompt();
+      showToast('Form reset to default concept baseline');
+    });
+
+    /* ==========================================================
+       PRESET STORAGE (20 DISCRETE SLOTS) & JSON SNAPSHOTS
+       ========================================================== */
+
+    function getPresetsFromStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function savePresetsToStorage(data) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      } catch (e) {
+        showToast('Storage quota exceeded');
+      }
+    }
+
+    function initSlotSelector() {
+      slotSelectEl.innerHTML = '';
+      const presets = getPresetsFromStorage();
+      for (let i = 1; i <= MAX_SLOTS; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        const pad = String(i).padStart(2, '0');
+        const item = presets[i];
+        opt.textContent = item ? `Slot ${pad}: ${item.title}` : `Slot ${pad} (Empty)`;
+        slotSelectEl.appendChild(opt);
+      }
+    }
+
+    function renderPresetSlots() {
+      const presets = getPresetsFromStorage();
+      slotsContainerEl.innerHTML = '';
+
+      for (let i = 1; i <= MAX_SLOTS; i++) {
+        const pad = String(i).padStart(2, '0');
+        const item = presets[i];
+        const card = document.createElement('div');
+        card.className = `p-2.5 rounded-xl border text-xs flex items-center justify-between transition-all ${
+          item 
+            ? 'bg-white border-architect-200/90 shadow-blueprint hover:border-architect-300' 
+            : 'bg-architect-50/50 border-dashed border-architect-200 text-architect-400'
+        }`;
+
+        if (item) {
+          card.innerHTML = `
+            <div class="flex items-center gap-2.5 overflow-hidden pr-2">
+              <span class="w-6 h-6 rounded-md bg-architect-900 text-white flex items-center justify-center text-[10px] font-mono shrink-0">${pad}</span>
+              <div class="truncate">
+                <div class="font-semibold text-architect-800 truncate" title="${item.title}">${item.title}</div>
+                <div class="text-[10px] text-architect-400 font-mono">${item.timestamp || 'Stored Preset'}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <button 
+                onclick="loadPreset(${i})" 
+                class="px-2 py-1 rounded-md bg-architect-100 hover:bg-architect-200 text-architect-700 text-[11px] font-medium transition-colors"
+                title="Load into active form"
+              >
+                Load
+              </button>
+              <button 
+                onclick="deletePreset(${i})" 
+                class="p-1 rounded-md text-architect-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                title="Delete preset"
+              >
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          `;
+        } else {
+          card.innerHTML = `
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-md bg-architect-100 text-architect-400 flex items-center justify-center text-[10px] font-mono shrink-0">${pad}</span>
+              <span class="text-architect-400 italic text-[11px]">Empty Slot</span>
+            </div>
+            <button 
+              onclick="saveDirect(${i})" 
+              class="px-2 py-1 rounded-md bg-architect-100/70 hover:bg-architect-100 text-architect-600 text-[11px] font-medium transition-colors border border-architect-200/60"
+              title="Store active form to this slot"
+            >
+              + Store
+            </button>
+          `;
+        }
+        slotsContainerEl.appendChild(card);
+      }
+      lucide.createIcons();
+    }
+
+    function getCurrentFormSnapshot() {
+      return {
+        title: promptTitleEl.value.trim() || 'Untitled Spatial Concept',
+        space: spaceTypeEl.value,
+        lighting: lightingStyleEl.value,
+        material: materialityStyleEl.value,
+        camera: cameraFramingEl.value,
+        additional: additionalFactorsEl.value,
+        timestamp: new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+      };
+    }
+
+    function saveToSlotIndex(slotIndex) {
+      if (slotIndex < 1 || slotIndex > MAX_SLOTS) return;
+      const presets = getPresetsFromStorage();
+      presets[slotIndex] = getCurrentFormSnapshot();
+      savePresetsToStorage(presets);
+      initSlotSelector();
+      slotSelectEl.value = slotIndex;
+      renderPresetSlots();
+
+      saveStatusFeedback.classList.remove('opacity-0');
+      setTimeout(() => {
+        saveStatusFeedback.classList.add('opacity-0');
+      }, 2000);
+      showToast(`Slot ${String(slotIndex).padStart(2, '0')} preserved successfully`);
+    }
+
+    window.saveDirect = function(slotIndex) {
+      saveToSlotIndex(slotIndex);
+    };
+
+    window.loadPreset = function(slotIndex) {
+      const presets = getPresetsFromStorage();
+      const item = presets[slotIndex];
+      if (!item) return;
+
+      promptTitleEl.value = item.title || '';
+      spaceTypeEl.value = item.space || 'modern_apartment';
+      lightingStyleEl.value = item.lighting || 'daylight';
+      materialityStyleEl.value = item.material || 'scandi_minimal';
+      cameraFramingEl.value = item.camera || 'eye_level_two_point';
+      additionalFactorsEl.value = item.additional || '';
+      charCountBadgeEl.textContent = `${additionalFactorsEl.value.length} / 240`;
+
+      generatePrompt();
+      slotSelectEl.value = slotIndex;
+      showToast(`Loaded Slot ${String(slotIndex).padStart(2, '0')}: "${item.title}"`);
+    };
+
+    window.deletePreset = function(slotIndex) {
+      const presets = getPresetsFromStorage();
+      if (!presets[slotIndex]) return;
+      delete presets[slotIndex];
+      savePresetsToStorage(presets);
+      initSlotSelector();
+      renderPresetSlots();
+      showToast(`Cleared Slot ${String(slotIndex).padStart(2, '0')}`);
+    };
+
+    btnSaveToSlot.addEventListener('click', () => {
+      const slot = parseInt(slotSelectEl.value, 10) || 1;
+      saveToSlotIndex(slot);
+    });
+
+    // Export JSON Snapshot
+    btnExportJson.addEventListener('click', () => {
+      const presets = getPresetsFromStorage();
+      const exportObject = {
+        application: "Atelier Architectural Interior AI Studio",
+        version: "2.4",
+        exportedAt: new Date().toISOString(),
+        totalSlots: MAX_SLOTS,
+        presets: presets
+      };
+
+      const dataUri = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObject, null, 2));
+      const link = document.createElement('a');
+      link.setAttribute("href", dataUri);
+      link.setAttribute("download", `architectural_interior_presets_${Date.now()}.json`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      showToast('Exported preset snapshot JSON');
+    });
+
+    // Import JSON Snapshot
+    btnImportJson.addEventListener('click', () => {
+      importFileInput.value = null;
+      importFileInput.click();
+    });
+
+    importFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        try {
+          const parsed = JSON.parse(event.target.result);
+          let targetData = {};
+
+          if (parsed && typeof parsed.presets === 'object') {
+            targetData = parsed.presets;
+          } else if (parsed && typeof parsed === 'object') {
+            targetData = parsed;
+          } else {
+            throw new Error("Invalid format");
+          }
+
+          const sanitized = {};
+          for (let i = 1; i <= MAX_SLOTS; i++) {
+            if (targetData[i] && targetData[i].title) {
+              sanitized[i] = targetData[i];
+            }
+          }
+
+          savePresetsToStorage(sanitized);
+          initSlotSelector();
+          renderPresetSlots();
+          showToast('Presets imported successfully!');
+        } catch (err) {
+          showToast('Failed to parse valid JSON');
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // Seed Initial Architectural Presets
+    function seedDefaultPresets() {
+      const existing = getPresetsFromStorage();
+      if (Object.keys(existing).length === 0) {
+        const defaults = {
+          1: {
+            title: "Minimalist Concrete Loft & Daylight Void",
+            space: "modern_apartment",
+            lighting: "daylight",
+            material: "scandi_minimal",
+            camera: "eye_level_two_point",
+            additional: "Polished concrete floors with diffuse skylight reflections, cantilevered oak staircase, understated architectural furniture.",
+            timestamp: "Architect Baseline"
+          },
+          2: {
+            title: "Atrium Grand Concert Hall",
+            space: "concert_theatre",
+            lighting: "warm_downlights",
+            material: "mid_century",
+            camera: "wide_tilt_shift",
+            additional: "Acoustic curved timber fins, recessed brass light reveals, tiers of crimson velour seats in perfect perspective.",
+            timestamp: "Architect Baseline"
+          },
+          3: {
+            title: "Vintage Marble Salon & French Doors",
+            space: "vintage_mansion",
+            lighting: "multi_source",
+            material: "neoclassical",
+            camera: "sectional_axial",
+            additional: "Honed Carrara marble fireplace, ornate boiserie wall paneling, herringbone parquetry reflecting soft evening lamps.",
+            timestamp: "Architect Baseline"
+          },
+          4: {
+            title: "Brutalist Hydrotherapy Pool",
+            space: "indoor_pool",
+            lighting: "daylight",
+            material: "brutalist_concrete",
+            camera: "eye_level_two_point",
+            additional: "Deep recessed light well, water caustic ripples grazing monolithic board-formed concrete walls.",
+            timestamp: "Architect Baseline"
+          }
+        };
+        savePresetsToStorage(defaults);
+      }
+    }
+
+    // Window Init
+    window.addEventListener('DOMContentLoaded', () => {
+      seedDefaultPresets();
+      initSlotSelector();
+      renderPresetSlots();
+      generatePrompt();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
